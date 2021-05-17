@@ -22,7 +22,26 @@ function v3max(out,v0,v1)
 
 function close_enough(p0,p1)
 {
-	let eps = 0.0001;
+	let eps = 0.000000001;
+
+	let dx = p0.x - p1.x;
+	if (dx < -eps || eps < dx)
+		return false;
+
+	let dy = p0.y - p1.y;
+	if (dy < -eps || eps < dy)
+		return false;
+
+	let dz = p0.z - p1.z;
+	if (dz < -eps || eps < dz)
+		return false;
+
+	return true;
+}
+
+function close_enough_normal(p0,p1)
+{
+	let eps = 0.002;
 
 	let dx = p0.x - p1.x;
 	if (dx < -eps || eps < dx)
@@ -163,7 +182,7 @@ function Triangle(p0, p1, p2, n)
 
 		// if the normals aren't "close enough" then
 		// they can't be coplanar
-		if (!close_enough(this.normal, t.normal))
+		if (!close_enough_normal(this.normal, t.normal))
 			return 0;
 
 		// do we have any point matches?

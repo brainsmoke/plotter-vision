@@ -125,7 +125,7 @@ function STL(content)
 	}
 
 	// trade some accuracy for faster rendering and better drawing
-	this.min_length = 5;
+	this.min_length = 0;
 
 	// map the STL vertices within a fraction of a pixel
 	// so that coplanar mapping can be done much more quickly.
