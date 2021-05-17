@@ -29,6 +29,7 @@ function parse_xyz(bytes, offset)
 function stl_ascii(content)
 {
 	let vertex = [];
+	let normal = [];
 
 	// super simple attempt to just convert every three line triple
 	// of vertices into a XYZ point
@@ -42,15 +43,32 @@ function stl_ascii(content)
 		));
 	});
 
+	content.replace(/facet normal\s+([^\s]+\s+[^\s]+\s+[^\s]+)/g, (match, verts) => {
+		//console.log(verts);
+		const coords = verts.split(/\s+/);
+		normal.push(createVector(
+			float(coords[0]),
+			float(coords[1]),
+			float(coords[2]),
+		));
+	});
+
 	console.log("vertex count = ", vertex.length);
+	console.log("normal count = ", normal.length);
+	if (vertex.length != normal.length*3)
+	{
+		console.log("number of normals read does not match with the number of vertices read, calculating normals instead");
+		normal = [];
+	}
 
 	let triangles = [];
-	for(let i = 0 ; i < vertex.length ; i += 3)
+	for(let i = 0 ; i < Math.floor(vertex.length/3) ; i++)
 	{
 		triangles.push(new Triangle(
-			vertex[i+0],
-			vertex[i+1],
-			vertex[i+2],
+			vertex[i*3+0],
+			vertex[i*3+1],
+			vertex[i*3+2],
+			normal[i],
 		));
 	}
 
@@ -85,6 +103,8 @@ function stl_binary(rawbytes)
 			parse_xyz(bytes, offset + 12),
 			parse_xyz(bytes, offset + 24),
 			parse_xyz(bytes, offset + 36),
+
+			parse_xyz(bytes, offset), // normal
 		));
 	}
 

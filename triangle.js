@@ -6,8 +6,6 @@ function tri_normal(p0,p1,p2)
 	return v0.cross(v1).normalize();
 }
 
-
-
 function v3min(out,v0,v1)
 {
 	out.x = Math.min(v0.x, v1.x);
@@ -41,6 +39,22 @@ function close_enough(p0,p1)
 	return true;
 }
 
+function acceptable_normal(p0,p1,p2,n)
+{
+	let eps = 0.0001;
+
+	let v0 = p5.Vector.sub(p1, p0);
+	let v1 = p5.Vector.sub(p2, p0);
+
+	if (Math.abs(v0.dot(n)) > eps)
+		return false;
+
+	if (Math.abs(v1.dot(n)) > eps)
+		return false;
+
+	return true;
+}
+
 function onscreen(p, w, h)
 {
 	if (p.x < -w/2 || w/2 < p.x)
@@ -52,11 +66,21 @@ function onscreen(p, w, h)
 
 let triangle_id = 0;
 
-function Triangle(p0, p1, p2)
+function Triangle(p0, p1, p2, n)
 {
 	this.id = triangle_id++;
 	this.model = [p0,p1,p2];
-	this.normal = tri_normal(p0,p1,p2);
+
+	this.normal = n;
+	if ( n != undefined && !acceptable_normal(p0,p1,p2,n) )
+	{
+		console.log("rejecting normal " + this );
+		n = undefined;
+	}
+
+	if ( n == undefined )
+		this.normal = tri_normal(p0,p1,p2);
+
 	this.screen = [ createVector(), createVector(), createVector() ];
 	this.min = createVector();
 	this.max = createVector();
