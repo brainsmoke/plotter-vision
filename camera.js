@@ -47,7 +47,7 @@ function Camera(eye,lookat,up,fov)
 
 		let x = p[0] / p[3];
 		let y = p[1] / p[3];
-		let z = p[2];
+		let z = p[2] / p[3];
 		if (!v_out)
 			return createVector(x,y,z);
 
@@ -79,17 +79,18 @@ function Camera(eye,lookat,up,fov)
 			[ 0,   0,   0,   1 ],
 		];
 
+		// the gluPerspective matrix, z-axis scaling is left in here for completeness
 		let scale = 1000.0 / tan(this.fov * PI / 180 / 2);
 		let near = 1;
 		let far = 200;
 		let f1 = - far / (far - near);
-		let f2 = - far * near / (far - near);
+		let f2 = - 2 * far * near / (far - near);
 
 		let perspective = [
 			[ scale, 0, 0, 0 ],
 			[ 0, scale, 0, 0 ],
-			[ 0, 0, f2, -1 ],
-			[ 0, 0, f1,  0 ],
+			[ 0, 0, f1, f2 ],
+			[ 0, 0, -1,  0 ],
 		];
 
 		this.matrix = m44_mult(perspective, cam);
